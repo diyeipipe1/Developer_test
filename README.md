@@ -21,6 +21,7 @@ Making sure to input a valid XML or JSON file. In case any changes are made to t
 
 ### Windows (MinGW)
 
+0. In case MinGW is not installed on the current system, use the following guide [here](https://code.visualstudio.com/docs/cpp/config-mingw)
 1. Open a terminal (e.g., Git Bash).
 2. Navigate to the project directory.
 3. Run the following command to compile the project:
