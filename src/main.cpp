@@ -50,6 +50,17 @@ void parseJSON(const string& filename, vector<Employee>& employees) {
     for (SizeType i = 0; i < employeesArray.Size(); ++i) {
         const Value& emp = employeesArray[i];
 
+        // Error handling so that if data is missing or wrong type, employee skipped and error logged
+        if (!emp.HasMember("name") || !emp.HasMember("id") || !emp.HasMember("department") || !emp.HasMember("salary")) {
+            cerr << "Error: Missing required fields in employee object at index " << i << " in JSON: " << filename << endl;
+            continue;
+        }
+
+        if (!emp["name"].IsString() || !emp["id"].IsInt() || !emp["department"].IsString() || !emp["salary"].IsNumber()) {
+            cerr << "Error: Incorrect field types in employee object at index " << i << " in JSON: " << filename << endl;
+            continue;
+        }
+
         Employee e;
         e.name = emp["name"].GetString();
         e.id = emp["id"].GetInt();
@@ -83,19 +94,33 @@ void parseXML(const string& filename, vector<Employee>& employees) {
         XMLElement* departmentElem = elem->FirstChildElement("department");
         XMLElement* salaryElem = elem->FirstChildElement("salary");
 
-        if (nameElem && idElem && departmentElem && salaryElem) {
+        if (!nameElem || !idElem || !departmentElem || !salaryElem) {
+            cerr << "Error: Missing required fields in employee element in XML: " << filename << endl;
+            continue;
+        }
+
+        if (!nameElem->GetText() || !idElem->GetText() || !departmentElem->GetText() || !salaryElem->GetText()) {
+            cerr << "Error: Empty text in required fields in employee element in XML: " << filename << endl;
+            continue;
+        }
+
+        try {
             e.name = nameElem->GetText();
             e.id = stoi(idElem->GetText());
             e.department = departmentElem->GetText();
             e.salary = stod(salaryElem->GetText());
-
-            employees.push_back(e);
-        } else {
-            cerr << "Error in employee element structure in XML: " << filename << endl;
+        } catch (const invalid_argument& ia) {
+            cerr << "Error: Invalid field types in employee element in XML: " << filename << " Error: " << ia.what() << endl;
+            continue;
+        } catch (const out_of_range& oor) {
+            cerr << "Error: Field value out of range in employee element in XML: " << filename << " Error: " << oor.what() << endl;
+            continue;
         }
+
+        employees.push_back(e);
     }
 }
-  
+
 // Function to calculate average salary of employees
 double calculateAverageSalary(const vector<Employee>& employees) {
     if (employees.empty()) return 0.0;
