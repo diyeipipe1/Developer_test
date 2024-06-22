@@ -20,7 +20,8 @@ struct Employee {
     double salary;
 };
 
-// Function to parse JSON file into Employee strcut
+
+// Function to parse JSON file into Employee struct
 void parseJSON(const string& filename, vector<Employee>& employees) {
     ifstream ifs(filename);
     if (!ifs.is_open()) {
@@ -40,13 +41,14 @@ void parseJSON(const string& filename, vector<Employee>& employees) {
         return;
     }
 
-    if (!doc.IsArray()) {
-        cerr << "Error: JSON is not array: " << filename << endl;
+    if (!doc.IsObject() || !doc.HasMember("employees") || !doc["employees"].IsArray()) {
+        cerr << "Error: JSON format is incorrect: " << filename << endl;
         return;
     }
 
-    for (SizeType i = 0; i < doc.Size(); ++i) {
-        const Value& emp = doc[i];
+    const Value& employeesArray = doc["employees"];
+    for (SizeType i = 0; i < employeesArray.Size(); ++i) {
+        const Value& emp = employeesArray[i];
 
         Employee e;
         e.name = emp["name"].GetString();
@@ -58,13 +60,12 @@ void parseJSON(const string& filename, vector<Employee>& employees) {
     }
 }
 
-// Function to parse XML file into Employee struct
 void parseXML(const string& filename, vector<Employee>& employees) {
     XMLDocument doc;
     XMLError error = doc.LoadFile(filename.c_str());
 
     if (error != XML_SUCCESS) {
-        cerr << "Error parsing XML: " << filename << endl;
+        cerr << "Error parsing XML: " << filename << " Error: " << error << endl;
         return;
     }
 
@@ -76,15 +77,25 @@ void parseXML(const string& filename, vector<Employee>& employees) {
 
     for (XMLElement* elem = root->FirstChildElement("employee"); elem != nullptr; elem = elem->NextSiblingElement("employee")) {
         Employee e;
-        e.name = elem->Attribute("name");
-        e.id = stoi(elem->Attribute("id"));
-        e.department = elem->Attribute("department");
-        e.salary = stod(elem->Attribute("salary"));
 
-        employees.push_back(e);
+        XMLElement* nameElem = elem->FirstChildElement("name");
+        XMLElement* idElem = elem->FirstChildElement("id");
+        XMLElement* departmentElem = elem->FirstChildElement("department");
+        XMLElement* salaryElem = elem->FirstChildElement("salary");
+
+        if (nameElem && idElem && departmentElem && salaryElem) {
+            e.name = nameElem->GetText();
+            e.id = stoi(idElem->GetText());
+            e.department = departmentElem->GetText();
+            e.salary = stod(salaryElem->GetText());
+
+            employees.push_back(e);
+        } else {
+            cerr << "Error in employee element structure in XML: " << filename << endl;
+        }
     }
 }
-
+  
 // Function to calculate average salary of employees
 double calculateAverageSalary(const vector<Employee>& employees) {
     if (employees.empty()) return 0.0;
