@@ -209,6 +209,12 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // Check if employees vector is empty
+    if (employees.empty()) {
+        cerr << "Error: No employee data found in the input file." << endl;
+        return 1;
+    }
+
     // Requisites
     double avgSalary = calculateAverageSalary(employees);
     Employee highestPaid = findHighestPaidEmployee(employees);
