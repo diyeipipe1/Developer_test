@@ -1,0 +1,8 @@
+<notstructure>
+    <employee>
+        <name>John Doe Right</name>
+        <id>102</id>
+        <department>Tech</department>
+        <salary>80000</salary>
+    </employee>
+</notstructure>

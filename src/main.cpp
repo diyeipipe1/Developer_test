@@ -221,12 +221,12 @@ int main(int argc, char** argv) {
     sortEmployeesByID(employees);
 
     // Print results
-    cout << "Average salary: $" << fixed << setprecision(2) << avgSalary << endl;
+    cout << "Average salary: $" << fixed << setprecision(2) << avgSalary << "\n\n";
     cout << "Highest paid employee:" << endl;
     cout << "Name: " << highestPaid.name << endl;
     cout << "ID: " << highestPaid.id << endl;
     cout << "Department: " << highestPaid.department << endl;
-    cout << "Salary: $" << fixed << setprecision(2) << highestPaid.salary << endl;
+    cout << "Salary: $" << fixed << setprecision(2) << highestPaid.salary << "\n\n";
     cout << "Sorted list of employees by ID:" << endl;
     for (const auto& emp : employees) {
         cout << "Name: " << emp.name << ", ID: " << emp.id << ", Department: " << emp.department << ", Salary: $" << fixed << setprecision(2) << emp.salary << endl;
