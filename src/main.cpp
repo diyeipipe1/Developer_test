@@ -61,14 +61,40 @@ void parseJSON(const string& filename, vector<Employee>& employees) {
             continue;
         }
 
+
+        // Error handling, make sure both ID and Salary are positive numbers
+        int id = emp["id"].GetInt();
+        double salary = emp["salary"].GetDouble();
+
+        if (id < 0 || salary < 0) {
+            cerr << "Error: Negative id or salary in employee object at index " << i << " in JSON: " << filename << endl;
+            continue;
+        }
+
         Employee e;
         e.name = emp["name"].GetString();
-        e.id = emp["id"].GetInt();
+        e.id = id;
         e.department = emp["department"].GetString();
-        e.salary = emp["salary"].GetDouble();
+        e.salary = salary;
 
         employees.push_back(e);
     }
+}
+
+// Function to check if a string represents a valid integer
+bool isInteger(const char* str) {
+    if (!str || *str == '\0') {
+        return false;
+    }
+
+    while (*str) {
+        if (!isdigit(*str)) {
+            return false;
+        }
+        ++str;
+    }
+
+    return true;
 }
 
 void parseXML(const string& filename, vector<Employee>& employees) {
@@ -87,8 +113,6 @@ void parseXML(const string& filename, vector<Employee>& employees) {
     }
 
     for (XMLElement* elem = root->FirstChildElement("employee"); elem != nullptr; elem = elem->NextSiblingElement("employee")) {
-        Employee e;
-
         XMLElement* nameElem = elem->FirstChildElement("name");
         XMLElement* idElem = elem->FirstChildElement("id");
         XMLElement* departmentElem = elem->FirstChildElement("department");
@@ -104,11 +128,28 @@ void parseXML(const string& filename, vector<Employee>& employees) {
             continue;
         }
 
+        const char* idText = idElem->GetText();
+        if (!isInteger(idText)) {
+            cerr << "Error: Invalid id (not an integer) in employee element in XML: " << filename << endl;
+            continue;
+        }
+
         try {
+            int id = stoi(idElem->GetText());
+            double salary = stod(salaryElem->GetText());
+
+            if (id < 0 || salary < 0) {
+                cerr << "Error: Negative id or salary in employee element in XML: " << filename << endl;
+                continue;
+            }
+
+            Employee e;
             e.name = nameElem->GetText();
-            e.id = stoi(idElem->GetText());
+            e.id = id;
             e.department = departmentElem->GetText();
-            e.salary = stod(salaryElem->GetText());
+            e.salary = salary;
+
+            employees.push_back(e);
         } catch (const invalid_argument& ia) {
             cerr << "Error: Invalid field types in employee element in XML: " << filename << " Error: " << ia.what() << endl;
             continue;
@@ -116,8 +157,6 @@ void parseXML(const string& filename, vector<Employee>& employees) {
             cerr << "Error: Field value out of range in employee element in XML: " << filename << " Error: " << oor.what() << endl;
             continue;
         }
-
-        employees.push_back(e);
     }
 }
 

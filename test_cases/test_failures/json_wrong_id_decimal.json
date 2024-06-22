@@ -1,0 +1,22 @@
+{
+    "employees": [
+        {
+            "name": "John Doe Right One",
+            "id": 105,
+            "department": "Tech",
+            "salary": 80000    
+        },
+        {
+            "name": "John Doe Wrong",
+            "id": 1091.1,
+            "department": "Tech",
+            "salary": 50000  
+        },
+        {
+            "name": "John Doe Right",
+            "id": 102,
+            "department": "Tech",
+            "salary": 80000    
+        }
+    ]
+}
